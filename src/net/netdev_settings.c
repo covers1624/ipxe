@@ -86,6 +86,21 @@ const struct setting mtu_setting __setting ( SETTING_NETDEV, mtu ) = {
 	.type = &setting_type_int16,
 	.tag = DHCP_MTU,
 };
+const struct setting link_setting __setting (SETTING_NETDEV, link) = {
+	.name = "link",
+	.description = "Link status",
+	.type = &setting_type_string
+};
+const struct setting status_setting __setting (SETTING_NETDEV, status) = {
+	.name = "status",
+	.description = "Device status",
+	.type = &setting_type_string
+};
+const struct setting driver_desc_setting __setting (SETTING_NETDEV, ddesc) = {
+	.name = "ddesc",
+	.description = "Device Driver description",
+	.type = &setting_type_string
+};
 
 /**
  * Store link-layer address setting
@@ -272,6 +287,56 @@ static int netdev_fetch_ifname ( struct net_device *netdev, void *data,
 	return strlen ( ifname );
 }
 
+/**
+ * Fetch the device link status.
+ *
+ * This will return the literal 'up' or 'down'.
+ *
+ * @v netdev		Network device
+ * @v data		Buffer to fill with setting data
+ * @v len		Length of buffer
+ * @ret len		Length of setting data, or negative error
+ */
+static int netdev_fetch_link ( struct net_device *netdev, void *data,
+				 size_t len ) {
+	const char * status = netdev_link_ok(netdev) ? "up" : "down";
+	strncpy(data, status, len);
+	return strlen(status);
+}
+
+/**
+ * Fetch the device open status.
+ *
+ * This will return the literal 'open' or 'closed'.
+ *
+ * @v netdev		Network device
+ * @v data		Buffer to fill with setting data
+ * @v len		Length of buffer
+ * @ret len		Length of setting data, or negative error
+ */
+static int netdev_fetch_status ( struct net_device *netdev, void *data,
+				 size_t len ) {
+	const char * status = netdev_is_open(netdev) ? "open" : "closed";
+	strncpy(data, status, len);
+	return strlen(status);
+}
+
+/**
+ * Fetch the interfaces device driver description.
+ *
+ * @v netdev		Network device
+ * @v data		Buffer to fill with setting data
+ * @v len		Length of buffer
+ * @ret len		Length of setting data, or negative error
+ */
+static int netdev_fetch_driver_desc ( struct net_device *netdev, void *data,
+				 size_t len ) {
+	const char * desc = netdev->dev->driver_description;
+
+	strncpy(data, desc, len);
+	return strlen(desc);
+}
+
 /** A network device setting operation */
 struct netdev_setting_operation {
 	/** Setting */
@@ -305,6 +370,9 @@ static struct netdev_setting_operation netdev_setting_operations[] = {
 	{ &linktype_setting, NULL, netdev_fetch_linktype },
 	{ &chip_setting, NULL, netdev_fetch_chip },
 	{ &ifname_setting, NULL, netdev_fetch_ifname },
+	{ &link_setting, NULL, netdev_fetch_link },
+	{ &status_setting, NULL, netdev_fetch_status },
+	{ &driver_desc_setting, NULL, netdev_fetch_driver_desc },
 };
 
 /**
