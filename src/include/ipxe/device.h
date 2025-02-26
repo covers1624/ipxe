@@ -75,6 +75,8 @@ struct device {
 	char name[40];
 	/** Driver name */
 	const char *driver_name;
+	/** Driver Description */
+	const char *driver_description;
 	/** Device description */
 	struct device_description desc;
 	/** Devices on the same bus */

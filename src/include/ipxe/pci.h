@@ -170,6 +170,8 @@ FILE_LICENCE ( GPL2_OR_LATER_OR_UBDL );
 struct pci_device_id {
 	/** Name */
 	const char *name;
+	/** Description */
+	const char *description;
 	/** PCI vendor ID */
 	uint16_t vendor;
 	/** PCI device ID */
@@ -298,6 +300,7 @@ struct pci_driver {
 	.vendor = _vendor,						\
 	.device = _device,						\
 	.name = _name,							\
+	.description = _description,			\
 	.driver_data = _data						\
 }
 #define PCI_ROM( _vendor, _device, _name, _description, _data ) \
@@ -348,6 +351,7 @@ static inline void pci_set_driver ( struct pci_device *pci,
 	pci->driver = driver;
 	pci->id = id;
 	pci->dev.driver_name = id->name;
+	pci->dev.driver_description = id->description;
 }
 
 /**
